@@ -26,10 +26,11 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: "*",
+    origin: (origin, callback) => callback(null, true),
     credentials: true,
   })
 );
+
 
 
 // MIDDLEWARE
