@@ -5,8 +5,8 @@ require("dotenv").config();
 
 console.log("Connecting to MongoDB...");
 
-
 // ROUTES
+const otpRoutes = require("./routes/otpRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const cattleRoutes = require("./routes/cattleRoutes");
 const adoptionRoutes = require("./routes/adoptionRoutes");
@@ -14,24 +14,13 @@ const userRoutes = require("./routes/userRoutes");
 
 const app = express();
 
-// ✅ FINAL WORKING CORS CONFIG
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:5174",
-  "http://localhost:5175",
-  "http://localhost:5176",
-  "http://localhost:5177"
-];
-
-
+// CORS
 app.use(
   cors({
     origin: (origin, callback) => callback(null, true),
     credentials: true,
   })
 );
-
-
 
 // MIDDLEWARE
 app.use(express.json());
@@ -42,6 +31,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/cattle", cattleRoutes);
 app.use("/api/adoptions", adoptionRoutes);
+app.use("/api/otp", otpRoutes);   // ✅ ADDED THIS LINE
 
 // MONGO CONNECTION
 mongoose

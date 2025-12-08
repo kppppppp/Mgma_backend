@@ -10,11 +10,9 @@ router.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Check existing
     const exists = await User.findOne({ email });
     if (exists) return res.status(400).json({ msg: "Email already used" });
 
-    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashed = await bcrypt.hash(password, salt);
 
@@ -46,14 +44,22 @@ router.post("/login", async (req, res) => {
   res.json({ token, user });
 });
 
+// LOGOUT (token-based, no cookies to clear)
+router.post("/logout", (req, res) => {
+  return res.json({ msg: "Logged out" });
+});
+
 // GET LOGGED USER
 router.get("/me", async (req, res) => {
   try {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) return res.status(401).json({ msg: "No token" });
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ msg: "No token" });
 
+    const token = authHeader.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
     const user = await User.findById(decoded.id).select("-password");
+    if (!user) return res.status(404).json({ msg: "User not found" });
 
     res.json(user);
   } catch (err) {
